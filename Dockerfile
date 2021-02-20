@@ -33,8 +33,8 @@ RUN apt-get install -y nodejs
 RUN npm i -g pm2 @angular/core @angular/cli
 
 # 컨테이너가 LISTEN 할 포트 지정
-EXPOSE 80
-EXPOSE 443
+# EXPOSE 80
+# EXPOSE 443
 
 # 컨테이너가 시작될 때마다 실행할 명령어(커맨드) 설정
 CMD ["/bin/bash"]
