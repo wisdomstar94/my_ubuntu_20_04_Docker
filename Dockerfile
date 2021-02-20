@@ -15,7 +15,7 @@ RUN apt-get upgrade -y
 # echo 6 => ASIA 선택한다는 뜻
 # ECHO 69 => Seoul 선택한다는 뜻
 # 시간대가 Asia/Seoul 로 설정됨
-RUN (echo 6 ; echo 69) | apt-get install net-tools cron systemd curl wget vim cmake gcc -y
+RUN (echo 6 ; echo 69) | apt-get install net-tools cron systemd curl wget vim cmake gcc g++ -y
 
 # 한글 UTF-8 언어팩 설치 및 적용
 # 언어셋이 ko_KR.UTF-8 로 설정됨
