@@ -29,6 +29,16 @@ RUN sed -i'' -r -e "/this file has to be sourced in/a\export LANG=ko_KR.UTF-8" /
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get install -y nodejs
 
+# git 2.30.x 설치
+RUN apt-get install libssl-dev libcurl4-gnutls-dev zlib1g-dev gettext -y
+WORKDIR /usr/src
+RUN wget https://www.kernel.org/pub/software/scm/git/git-2.30.0.tar.gz
+RUN tar -xvzf git-2.30.0.tar.gz
+WORKDIR /usr/src/git-2.30.0
+RUN ./configure --prefix=/usr/local/git
+RUN make && make install
+RUN sed -i'' -r -e "/export LANG=ko_KR.UTF-8/a\export PATH=\$PATH:/usr/local/git/bin" /etc/bash.bashrc
+
 # 필요한 npm 패키지 전역 설치
 RUN npm i -g pm2 @angular/core @angular/cli
 
