@@ -46,5 +46,32 @@ RUN npm i -g pm2 @angular/core @angular/cli
 # EXPOSE 80
 # EXPOSE 443
 
+# MariadbDB 10.5 설치 (mysql_secure_installation 으로 초기 셋팅 필요)
+RUN apt-get install software-properties-common -y
+RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
+RUN add-apt-repository 'deb [arch=amd64,arm64,ppc64el] http://mirror.lstn.net/mariadb/repo/10.5/ubuntu focal main'
+RUN apt update -y
+RUN apt install mariadb-server -y
+# RUN systemctl enable mariadb
+RUN sed -i'' -r -e "/\/usr\/local\/git\/bin/a\service mariadb start" /etc/bash.bashrc
+
+# MariaDB 기본 언어셋 UTF-8로 설정
+RUN sed -i'' -r -e "/\[mysql\]/a\default-character-set = utf8mb4" /etc/mysql/mariadb.conf.d/50-mysql-clients.cnf \
+&& sed -i'' -r -e "/\[mysql_upgrade\]/a\default-character-set = utf8mb4" /etc/mysql/mariadb.conf.d/50-mysql-clients.cnf \
+&& sed -i'' -r -e "/\[mysqladmin\]/a\default-character-set = utf8mb4" /etc/mysql/mariadb.conf.d/50-mysql-clients.cnf \
+&& sed -i'' -r -e "/\[mysqlbinlog\]/a\default-character-set = utf8mb4" /etc/mysql/mariadb.conf.d/50-mysql-clients.cnf \
+&& sed -i'' -r -e "/\[mysqlcheck\]/a\default-character-set = utf8mb4" /etc/mysql/mariadb.conf.d/50-mysql-clients.cnf \
+&& sed -i'' -r -e "/\[mysqldump\]/a\default-character-set = utf8mb4" /etc/mysql/mariadb.conf.d/50-mysql-clients.cnf \
+&& sed -i'' -r -e "/\[mysqlimport\]/a\default-character-set = utf8mb4" /etc/mysql/mariadb.conf.d/50-mysql-clients.cnf \
+&& sed -i'' -r -e "/\[mysqlshow\]/a\default-character-set = utf8mb4" /etc/mysql/mariadb.conf.d/50-mysql-clients.cnf \
+&& sed -i'' -r -e "/\[mysqlslap\]/a\default-character-set = utf8mb4" /etc/mysql/mariadb.conf.d/50-mysql-clients.cnf
+
+# MariaDB bind-address 를 0.0.0.0 으로 변경 (호스트OS에서 컨테이너의 MariaDB에 HeidiSQL 같은 툴로 접근하기 위함)
+RUN sed -i'' -r -e "s/bind-address/\# bind-address/" /etc/mysql/mariadb.conf.d/50-server.cnf
+RUN sed -i'' -r -e "/bind-address            = 127.0.0.1/a\bind-address            = 0.0.0.0" /etc/mysql/mariadb.conf.d/50-server.cnf
+
+# 루트 경로로 이동
+WORKDIR /
+
 # 컨테이너가 시작될 때마다 실행할 명령어(커맨드) 설정
 CMD ["/bin/bash"]
