@@ -25,16 +25,16 @@ RUN update-locale LANG=ko_KR.UTF-8 LC_MESSAGES=POSIX
 RUN export LANG=ko_KR.UTF-8
 RUN sed -i'' -r -e "/this file has to be sourced in/a\export LANG=ko_KR.UTF-8" /etc/bash.bashrc
 
-# Node.js 14.x 설치
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+# Node.js 16.x 설치
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get install -y nodejs
 
-# git 2.30.x 설치
+# git 2.33.1 설치
 RUN apt-get install libssl-dev libcurl4-gnutls-dev zlib1g-dev gettext -y
 WORKDIR /usr/src
-RUN wget https://www.kernel.org/pub/software/scm/git/git-2.30.0.tar.gz
-RUN tar -xvzf git-2.30.0.tar.gz
-WORKDIR /usr/src/git-2.30.0
+RUN wget https://www.kernel.org/pub/software/scm/git/git-2.33.1.tar.gz
+RUN tar -xvzf git-2.33.1.tar.gz
+WORKDIR /usr/src/git-2.33.1
 RUN ./configure --prefix=/usr/local/git
 RUN make && make install
 RUN sed -i'' -r -e "/export LANG=ko_KR.UTF-8/a\export PATH=\$PATH:/usr/local/git/bin" /etc/bash.bashrc
@@ -46,10 +46,10 @@ RUN npm i -g pm2 @angular/core @angular/cli
 # EXPOSE 80
 # EXPOSE 443
 
-# MariadbDB 10.5 설치 (mysql_secure_installation 으로 초기 셋팅 필요)
+# MariaDB 10.6.5 설치 (mysql_secure_installation 으로 초기 셋팅 필요)
 RUN apt-get install software-properties-common -y
 RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
-RUN add-apt-repository 'deb [arch=amd64,arm64,ppc64el] http://mirror.lstn.net/mariadb/repo/10.5/ubuntu focal main'
+RUN add-apt-repository 'deb [arch=amd64,arm64,ppc64el] http://mirror.lstn.net/mariadb/repo/10.6/ubuntu focal main'
 RUN apt update -y
 RUN apt install mariadb-server -y
 # RUN systemctl enable mariadb
