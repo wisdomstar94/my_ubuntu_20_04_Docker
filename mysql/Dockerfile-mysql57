@@ -1,0 +1,74 @@
+# 우분투 OS로 지정
+FROM ubuntu:20.04
+
+# 라벨 지정
+LABEL "MAINTAINER"="Shin Jae Hyeon"
+LABEL "DESCRIPTION"="Install what you need on ubuntu:20.04"
+
+# apt-get update 진행
+RUN apt-get update -y
+
+# apt-get upgrade 진행
+RUN apt-get upgrade -y
+
+# 기본적인 패키지 설치 및 환경설정 진행
+# echo 6 => ASIA 선택한다는 뜻
+# ECHO 69 => Seoul 선택한다는 뜻
+# 시간대가 Asia/Seoul 로 설정됨
+RUN (echo 6 ; echo 69) | apt-get install net-tools cron systemd curl wget vim cmake gcc g++ -y
+
+# 한글 UTF-8 언어팩 설치 및 적용
+# 언어셋이 ko_KR.UTF-8 로 설정됨
+RUN apt-get install language-pack-ko -y
+RUN locale-gen ko_KR.UTF-8
+RUN update-locale LANG=ko_KR.UTF-8 LC_MESSAGES=POSIX
+RUN export LANG=ko_KR.UTF-8
+
+# Node.js 16.x 설치
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt-get install -y nodejs
+
+# 필요한 npm 패키지 전역 설치
+RUN npm i -g pm2 @angular/core @angular/cli
+
+# git 2.34.1 설치
+RUN apt-get install libssl-dev libcurl4-gnutls-dev zlib1g-dev gettext -y
+WORKDIR /usr/src
+RUN wget https://www.kernel.org/pub/software/scm/git/git-2.34.1.tar.gz
+RUN tar -xvzf git-2.34.1.tar.gz
+WORKDIR /usr/src/git-2.34.1
+RUN ./configure --prefix=/usr/local/git
+RUN make && make install
+
+# golang 1.17.5 설치
+WORKDIR /usr/src
+RUN wget https://golang.org/dl/go1.17.5.linux-amd64.tar.gz
+RUN tar -C /usr/local -xzf go1.17.5.linux-amd64.tar.gz
+RUN export PATH=$PATH:/usr/local/go/bin
+
+# 컨테이너가 LISTEN 할 포트 지정
+# EXPOSE 80
+# EXPOSE 443
+
+# Mysql 5.7 설치하기 전 필요한 패키지 설치
+RUN apt-get install -y lsb-release gnupg 
+
+# Mysql 5.7 설치하기
+WORKDIR /root
+RUN wget https://dev.mysql.com/get/mysql-apt-config_0.8.12-1_all.deb
+RUN (echo 7 ; echo 1 ; echo 1 ; echo 4) | dpkg -i mysql-apt-config_0.8.12-1_all.deb
+RUN apt-get update
+RUN apt-cache policy mysql-server
+RUN DEBIAN_FRONTEND=noninteractive apt install -y -f mysql-client=5.7* mysql-community-server=5.7* mysql-server=5.7*
+RUN sed -i'' -r -e "s/127.0.0.1/0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
+
+# 컨테이너 실행시 구동할 내용 설정
+RUN mkdir /sh
+COPY execute_when_starting-mysql57.sh /sh/execute_when_starting-mysql57.sh
+RUN sed -i'' -r -e "/this file has to be sourced in/asource /sh/execute_when_starting-mysql57.sh" /etc/bash.bashrc
+
+# 루트 경로로 이동
+WORKDIR /
+
+# 컨테이너가 시작될 때마다 실행할 명령어(커맨드) 설정
+CMD ["/bin/bash"]
