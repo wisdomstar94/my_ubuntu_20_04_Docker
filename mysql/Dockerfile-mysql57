@@ -62,9 +62,14 @@ RUN apt-cache policy mysql-server
 RUN DEBIAN_FRONTEND=noninteractive apt install -y -f mysql-client=5.7* mysql-community-server=5.7* mysql-server=5.7*
 RUN sed -i'' -r -e "s/127.0.0.1/0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
 
+# db_init go 파일 빌드
+COPY mysql/db_init-mysql57.go /root/db_init-mysql57.go
+WORKDIR /root
+RUN /usr/local/go/bin/go build db_init-mysql57.go
+
 # 컨테이너 실행시 구동할 내용 설정
 RUN mkdir /sh
-COPY execute_when_starting-mysql57.sh /sh/execute_when_starting-mysql57.sh
+COPY mysql/execute_when_starting-mysql57.sh /sh/execute_when_starting-mysql57.sh
 RUN sed -i'' -r -e "/this file has to be sourced in/asource /sh/execute_when_starting-mysql57.sh" /etc/bash.bashrc
 
 # 루트 경로로 이동

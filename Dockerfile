@@ -72,6 +72,11 @@ RUN sed -i'' -r -e "/\[mysql\]/a\default-character-set = utf8mb4" /etc/mysql/mar
 RUN sed -i'' -r -e "s/bind-address/\# bind-address/" /etc/mysql/mariadb.conf.d/50-server.cnf
 RUN sed -i'' -r -e "/bind-address            = 127.0.0.1/a\bind-address            = 0.0.0.0" /etc/mysql/mariadb.conf.d/50-server.cnf
 
+# db_init go 파일 빌드
+COPY db_init.go /root/db_init.go
+WORKDIR /root
+RUN /usr/local/go/bin/go build db_init.go
+
 # 컨테이너 실행시 구동할 내용 설정
 RUN mkdir /sh
 COPY execute_when_starting.sh /sh/execute_when_starting.sh
