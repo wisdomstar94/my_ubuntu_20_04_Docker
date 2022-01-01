@@ -23,24 +23,28 @@ RUN apt-get install language-pack-ko -y
 RUN locale-gen ko_KR.UTF-8
 RUN update-locale LANG=ko_KR.UTF-8 LC_MESSAGES=POSIX
 RUN export LANG=ko_KR.UTF-8
-RUN sed -i'' -r -e "/this file has to be sourced in/a\export LANG=ko_KR.UTF-8" /etc/bash.bashrc
 
 # Node.js 16.x 설치
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get install -y nodejs
 
-# git 2.33.1 설치
-RUN apt-get install libssl-dev libcurl4-gnutls-dev zlib1g-dev gettext -y
-WORKDIR /usr/src
-RUN wget https://www.kernel.org/pub/software/scm/git/git-2.33.1.tar.gz
-RUN tar -xvzf git-2.33.1.tar.gz
-WORKDIR /usr/src/git-2.33.1
-RUN ./configure --prefix=/usr/local/git
-RUN make && make install
-RUN sed -i'' -r -e "/export LANG=ko_KR.UTF-8/a\export PATH=\$PATH:/usr/local/git/bin" /etc/bash.bashrc
-
 # 필요한 npm 패키지 전역 설치
 RUN npm i -g pm2 @angular/core @angular/cli
+
+# git 2.34.1 설치
+RUN apt-get install libssl-dev libcurl4-gnutls-dev zlib1g-dev gettext -y
+WORKDIR /usr/src
+RUN wget https://www.kernel.org/pub/software/scm/git/git-2.34.1.tar.gz
+RUN tar -xvzf git-2.34.1.tar.gz
+WORKDIR /usr/src/git-2.34.1
+RUN ./configure --prefix=/usr/local/git
+RUN make && make install
+
+# golang 1.17.5 설치
+WORKDIR /usr/src
+RUN wget https://golang.org/dl/go1.17.5.linux-amd64.tar.gz
+RUN tar -C /usr/local -xzf go1.17.5.linux-amd64.tar.gz
+RUN export PATH=$PATH:/usr/local/go/bin
 
 # 컨테이너가 LISTEN 할 포트 지정
 # EXPOSE 80
@@ -52,8 +56,6 @@ RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24
 RUN add-apt-repository 'deb [arch=amd64,arm64,ppc64el] http://mirror.lstn.net/mariadb/repo/10.6/ubuntu focal main'
 RUN apt update -y
 RUN apt install mariadb-server -y
-# RUN systemctl enable mariadb
-RUN sed -i'' -r -e "/\/usr\/local\/git\/bin/a\service mariadb start" /etc/bash.bashrc
 
 # MariaDB 기본 언어셋 UTF-8로 설정
 RUN sed -i'' -r -e "/\[mysql\]/a\default-character-set = utf8mb4" /etc/mysql/mariadb.conf.d/50-mysql-clients.cnf \
@@ -69,6 +71,11 @@ RUN sed -i'' -r -e "/\[mysql\]/a\default-character-set = utf8mb4" /etc/mysql/mar
 # MariaDB bind-address 를 0.0.0.0 으로 변경 (호스트OS에서 컨테이너의 MariaDB에 HeidiSQL 같은 툴로 접근하기 위함)
 RUN sed -i'' -r -e "s/bind-address/\# bind-address/" /etc/mysql/mariadb.conf.d/50-server.cnf
 RUN sed -i'' -r -e "/bind-address            = 127.0.0.1/a\bind-address            = 0.0.0.0" /etc/mysql/mariadb.conf.d/50-server.cnf
+
+# 컨테이너 실행시 구동할 내용 설정
+RUN mkdir /sh
+COPY execute_when_starting.sh /sh/execute_when_starting.sh
+RUN sed -i'' -r -e "/this file has to be sourced in/asource /sh/execute_when_starting.sh" /etc/bash.bashrc
 
 # 루트 경로로 이동
 WORKDIR /
