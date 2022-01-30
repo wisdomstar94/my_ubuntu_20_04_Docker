@@ -13,8 +13,8 @@ const initRootPassword string = "112233abc"
 func main() {
 	log.Println("db_init 시작")
 
-	// mysql 실행
-	var _ = Command("service", "mysql", "start")
+	// mysql 실행 // bash 에서 직접 실행하는 걸로 변경
+	// var _ = Command("service", "mysql", "start")
 
 	// 최초 초기화 작업이 이루어졌는지 아닌지 체크
 	if !isInit() {

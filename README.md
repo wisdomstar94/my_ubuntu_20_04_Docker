@@ -18,3 +18,52 @@
 - id : root
 - password : 112233abc
 
+# 
+
+# 이미지 사용 방법 (Dockerfile 을 사용하는 경우)
+
+1. 먼저 원하는 Dockerfile 을 빌드합니다.
+
+※ mariadb 용으로 빌드할 경우<br />
+```
+docker build --no-cache -t <이미지명>:<태그명> -f ./Dockerfile .
+```
+※ mysql 용으로 빌드할 경우<br />
+```
+docker build --no-cache -t <이미지명>:<태그명> -f ./mysql/Dockerfile-mysql57 .
+```
+<br />
+
+2. 그 후 아래 명령어로 docker container 를 생성합니다. <br />
+
+```
+docker run -i -t -d --privileged -p 3306:3306 --name <컨테이너명> <이미지명>:<태그명>
+```
+
+#
+
+# 이미지 사용 방법 (Docker Hub 를 사용하는 경우)
+
+1. 먼저 원하는 이미지를 pull 받습니다.
+
+※ mariadb 을 원한다면<br />
+```
+docker pull wisdomstar94/my_ubuntu_20_04:release-1.0.2
+```
+※ mysql 을 원한다면<br />
+```
+docker pull wisdomstar94/my_ubuntu_20_04:release-mysql57-1.0.3
+```
+<br />
+
+2. 그 후 아래 명령어로 docker container 를 생성합니다. <br />
+
+```
+docker run -i -t -d --privileged -p 3306:3306 --name <컨테이너명> <이미지명>:<태그명>
+```
+
+# 컨테이너 내부 접속 방법
+
+```
+docker exec -it <컨테이너명 or 컨테이너 해쉬값> bash
+```
