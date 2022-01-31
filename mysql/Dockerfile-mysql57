@@ -61,6 +61,7 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 467B942D3A79BD29 &&
 RUN apt-cache policy mysql-server
 RUN DEBIAN_FRONTEND=noninteractive apt install -y -f mysql-client=5.7* mysql-community-server=5.7* mysql-server=5.7*
 RUN sed -i'' -r -e "s/127.0.0.1/0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
+RUN sed -i'' -r -e "/0.0.0.0/adefault-time-zone='+9:00'" /etc/mysql/mysql.conf.d/mysqld.cnf
 
 # db_init go 파일 빌드
 COPY mysql/db_init-mysql57.go /root/db_init-mysql57.go
