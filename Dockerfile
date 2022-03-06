@@ -39,6 +39,7 @@ RUN tar -xvzf git-2.35.1.tar.gz
 WORKDIR /usr/src/git-2.35.1
 RUN ./configure --prefix=/usr/local/git
 RUN make && make install
+RUN export PATH=$PATH:/usr/local/git/bin
 
 # golang 1.17.8 설치
 WORKDIR /usr/src
