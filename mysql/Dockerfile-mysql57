@@ -31,19 +31,19 @@ RUN apt-get install -y nodejs
 # 필요한 npm 패키지 전역 설치
 RUN npm i -g pm2 @angular/core @angular/cli
 
-# git 2.34.1 설치
+# git 2.35.1 설치
 RUN apt-get install libssl-dev libcurl4-gnutls-dev zlib1g-dev gettext -y
 WORKDIR /usr/src
-RUN wget https://www.kernel.org/pub/software/scm/git/git-2.34.1.tar.gz
-RUN tar -xvzf git-2.34.1.tar.gz
-WORKDIR /usr/src/git-2.34.1
+RUN wget https://www.kernel.org/pub/software/scm/git/git-2.35.1.tar.gz
+RUN tar -xvzf git-2.35.1.tar.gz
+WORKDIR /usr/src/git-2.35.1
 RUN ./configure --prefix=/usr/local/git
 RUN make && make install
 
-# golang 1.17.5 설치
+# golang 1.17.8 설치
 WORKDIR /usr/src
-RUN wget https://golang.org/dl/go1.17.5.linux-amd64.tar.gz
-RUN tar -C /usr/local -xzf go1.17.5.linux-amd64.tar.gz
+RUN wget https://golang.org/dl/go1.17.8.linux-amd64.tar.gz
+RUN tar -C /usr/local -xzf go1.17.8.linux-amd64.tar.gz
 RUN export PATH=$PATH:/usr/local/go/bin
 
 # 컨테이너가 LISTEN 할 포트 지정
